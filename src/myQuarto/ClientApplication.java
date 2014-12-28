@@ -54,6 +54,15 @@ public class ClientApplication extends JFrame {
             }
         });
         
+        client.setConnectHandler(new IConnectHandler<QuartoPacket>() {
+            @Override
+            public void onConnect(AbstractClient<QuartoPacket> c) {
+                Logger.getGlobal().log(Level.INFO, "Connection to established");
+                
+                quartoPacket(client, "connect");
+            }
+        });
+        
         setContentPane(new PaneServerConnect(new BiConsumer<String, Boolean>() {
             @Override
             public void accept(String t, Boolean b) {
@@ -98,13 +107,5 @@ public class ClientApplication extends JFrame {
             
             ((PaneServerConnect)getContentPane()).setStatus("Invalid address...");
         }
-        client.setConnectHandler(new IConnectHandler<QuartoPacket>() {
-            @Override
-            public void onConnect(AbstractClient<QuartoPacket> c) {
-                Logger.getGlobal().log(Level.INFO, "Connection to " + address + " established");
-                
-                quartoPacket(client, "connect");
-            }
-        });
     }
 }
