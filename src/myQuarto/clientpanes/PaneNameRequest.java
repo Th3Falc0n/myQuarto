@@ -62,6 +62,6 @@ public class PaneNameRequest extends JPanel {
 
     public void setStatus(String text) {
         lblStatusLabel.setText(text);
-        label.repaint();
+        lblStatusLabel.repaint();
     }
 }
