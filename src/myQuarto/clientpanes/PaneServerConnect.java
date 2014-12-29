@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class PaneServerConnect extends JPanel {
     private static final long serialVersionUID = 1L;

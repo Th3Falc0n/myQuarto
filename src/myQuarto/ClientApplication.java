@@ -4,11 +4,26 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.interfaces.RSAKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JFrame;
 
 import org.lolhens.network.AbstractClient;
@@ -20,6 +35,8 @@ import org.lolhens.network.disconnect.Refused;
 import org.lolhens.network.disconnect.Timeout;
 import org.lolhens.network.nio.Client;
 
+import myQuarto.clientpanes.PaneConnecting;
+import myQuarto.clientpanes.PaneNameRequest;
 import myQuarto.clientpanes.PaneServerConnect;
 import myQuarto.netprot.QuartoPacket;
 import myQuarto.netprot.QuartoProtocol;
@@ -59,7 +76,7 @@ public class ClientApplication extends JFrame {
             public void onConnect(AbstractClient<QuartoPacket> c) {
                 Logger.getGlobal().log(Level.INFO, "Connection to established");
                 
-                quartoPacket(client, "connect");
+                quartoPacket(client, "connect", "den", "server", "hart", new byte[] {1,2,3,4,5,6});
             }
         });
         
@@ -71,6 +88,8 @@ public class ClientApplication extends JFrame {
         }));
         setSize(400, 150);
     }
+    
+    KeyPair localKeyPair;
     
     private void receivePacket(QuartoPacket packet) {
         switch(packet.getAction()) {
@@ -92,9 +111,94 @@ public class ClientApplication extends JFrame {
         case "request_identity":
             Logger.getGlobal().log(Level.INFO, "Server requesting identity");
             
-            ((PaneServerConnect)getContentPane()).setStatus("Joining...");
+            setContentPane(new PaneConnecting());
+            
+            ((PaneConnecting)getContentPane()).setStatus("Loading keypair...");
+            
+            localKeyPair = loadKeyPair();
+            
+            if(localKeyPair == null) {
+                ((PaneConnecting)getContentPane()).setStatus("Generating keypair...");
+                
+                localKeyPair = generateKeyPair();
+                saveKeyPair(localKeyPair);
+            }
+            
+            quartoPacket(client, "send_pubkey", "key", localKeyPair.getPublic());      
+            
+            ((PaneConnecting)getContentPane()).setStatus("Authenticating...");
+            
             break; 
+        case "confirm_srvkey":
+            Logger.getGlobal().log(Level.INFO, "Server requesting key confirmation");
+            try {
+                Cipher clPubkeyCipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+                
+                clPubkeyCipher.init(Cipher.DECRYPT_MODE, localKeyPair.getPrivate());
+                
+                byte[] pkDec = clPubkeyCipher.doFinal(packet.<byte[]>getObject("cipher"));
+                
+                quartoPacket(client, "confirm_privkey", "cdata", pkDec);
+                
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
+            break;
+        case "authentication_fail":
+            setContentPane(new PaneServerConnect(new BiConsumer<String, Boolean>() {
+                @Override
+                public void accept(String t, Boolean b) {
+                    tryConnect(t, b.booleanValue());
+                }
+            }));
+            
+            ((PaneServerConnect)getContentPane()).setStatus("RSA auth failed...");
+            
+            
+            break;
+        case "request_name":
+            setContentPane(new PaneNameRequest((n) -> confirmName(n, false), (n) -> confirmName(n, true)));
+            
+            break;
+        case "deny_name_checkout":
+            ((PaneNameRequest)getContentPane()).setStatus(packet.getString("message"));
+            
+            break;
+        case "welcome":
+            setContentPane(new PaneConnecting());
+            
+            ((PaneConnecting)getContentPane()).setStatus("Welcome " + packet.getString("name") + "...");
+            
+            break;
         }
+    }
+    
+    private String confirmName(String name, boolean doCheckout) {
+        quartoPacket(client, "confirm_name", "name", name, "do_checkout", doCheckout);
+        return !doCheckout ? "Checking..." : "Setting name...";
+    }
+    
+    private void saveKeyPair(KeyPair pair) {
+        
+    }
+    
+    private KeyPair loadKeyPair() {
+        return null;
+    }
+    
+    private KeyPair generateKeyPair() {
+        KeyPairGenerator kpg;
+        try {
+            kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(2048);
+            return kpg.genKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
     
     public void tryConnect(String address, boolean doHS) {

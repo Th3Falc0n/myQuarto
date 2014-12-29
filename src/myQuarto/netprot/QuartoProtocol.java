@@ -29,25 +29,25 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
         try {
             ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(arg0.array()));
             ret.data = (HashMap<String, Object>) in.readObject();
+            in.close();
         } catch (ClassNotFoundException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        Logger.getGlobal().log(Level.INFO, "Decoded packet with action \"" + ret.getAction() + "\"");
         
         return ret;
     }
 
     @Override
     protected ByteBuffer wrapPacket(QuartoPacket arg0) {
-        Logger.getGlobal().log(Level.INFO, "Wrapping packet with action \"" + arg0.getAction() + "\"");
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         try {
             ObjectOutputStream outs = new ObjectOutputStream(out);
             outs.writeObject(arg0.data);
+            outs.close();
+            out.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -68,8 +68,6 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
             
             pack.put((String)pairs[i], pairs[i+1]);
         }
-        
-        Logger.getGlobal().log(Level.INFO, "Sending packet with action \"" + action + "\"");
         
         c.send(pack);
     }

@@ -1,8 +1,22 @@
 package myQuarto.server;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import myQuarto.ServerApplication;
 import myQuarto.netprot.QuartoPacket;
@@ -25,6 +39,8 @@ public class ClientConnection extends Client<QuartoPacket> {
         super(protocolClazz);
         assignedServer = quartoServer;
     }
+    
+    byte[] checkdata = null;
 
     public void receivePacket(QuartoPacket packet) {
         switch(packet.getAction()) {
@@ -51,6 +67,54 @@ public class ClientConnection extends Client<QuartoPacket> {
                 quartoPacket(this, "deny_password");
             }
             return;
+        case "send_pubkey":
+            Logger.getGlobal().log(Level.INFO, "pubkey received. generating checkdata");
+            
+            try {
+                PublicKey key = packet.<PublicKey>getObject("key");
+                
+                Cipher clCDCipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+                
+                clCDCipher.init(Cipher.ENCRYPT_MODE, key);
+                
+                checkdata = new byte[256 - 11];
+                Random rnd = new Random();
+                
+                rnd.nextBytes(checkdata);
+                
+                Logger.getGlobal().log(Level.INFO, "encrypting");
+                
+                byte[] pkEnc = clCDCipher.doFinal(checkdata);
+                
+                Logger.getGlobal().log(Level.INFO, "sending");
+                
+                quartoPacket(this, "confirm_srvkey", "cipher", pkEnc);
+                
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
+            
+            return;
+        case "confirm_privkey":
+            if(Arrays.equals(packet.<byte[]>getObject("cdata"), checkdata)) {
+                //TODO: Get name from database
+                
+                quartoPacket(this, "request_name");
+            }
+            else
+            {
+                quartoPacket(this, "authentication_fail");
+            }
+            return;
+        
+        case "confirm_name":
+            
+            quartoPacket(this, "deny_name_checkout", "message", "du bist kacke");
+            
+            return;
+        
         }
 
         try {
