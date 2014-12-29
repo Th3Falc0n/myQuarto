@@ -86,7 +86,7 @@ public class ClientApplication extends JFrame {
                 tryConnect(t, b.booleanValue());
             }
         }));
-        setSize(400, 150);
+        setSize(500, 200);
     }
     
     KeyPair localKeyPair;
@@ -147,22 +147,27 @@ public class ClientApplication extends JFrame {
             
             break;
         case "authentication_fail":
+            Logger.getGlobal().log(Level.INFO, "RSA auth failed...");
             setContentPane(new PaneServerConnect(new BiConsumer<String, Boolean>() {
                 @Override
                 public void accept(String t, Boolean b) {
                     tryConnect(t, b.booleanValue());
                 }
             }));
+            repaint();
             
             ((PaneServerConnect)getContentPane()).setStatus("RSA auth failed...");
             
             
             break;
         case "request_name":
+            Logger.getGlobal().log(Level.INFO, "Server requesting nickname...");
             setContentPane(new PaneNameRequest((n) -> confirmName(n, false), (n) -> confirmName(n, true)));
+            repaint();
             
             break;
         case "deny_name_checkout":
+            Logger.getGlobal().log(Level.INFO, "Server denied nickname...");
             ((PaneNameRequest)getContentPane()).setStatus(packet.getString("message"));
             
             break;

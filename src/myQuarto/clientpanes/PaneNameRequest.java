@@ -48,7 +48,7 @@ public class PaneNameRequest extends JPanel {
             }
         });
         
-        JButton btnNewButton = new JButton("New button");
+        JButton btnNewButton = new JButton("Register nickname");
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 lblStatusLabel.setText(confirm.apply(textField.getText()));
@@ -62,5 +62,6 @@ public class PaneNameRequest extends JPanel {
 
     public void setStatus(String text) {
         lblStatusLabel.setText(text);
+        label.repaint();
     }
 }

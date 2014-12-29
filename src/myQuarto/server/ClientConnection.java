@@ -99,12 +99,14 @@ public class ClientConnection extends Client<QuartoPacket> {
             return;
         case "confirm_privkey":
             if(Arrays.equals(packet.<byte[]>getObject("cdata"), checkdata)) {
+                Logger.getGlobal().log(Level.INFO, "client confirmed key");
                 //TODO: Get name from database
                 
                 quartoPacket(this, "request_name");
             }
             else
             {
+                Logger.getGlobal().log(Level.INFO, "RSA auth failed...");
                 quartoPacket(this, "authentication_fail");
             }
             return;
