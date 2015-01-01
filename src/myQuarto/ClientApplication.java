@@ -1,5 +1,6 @@
 package myQuarto;
 
+import java.awt.Container;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
@@ -17,7 +18,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.logging.Filter;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -37,6 +40,7 @@ import org.lolhens.network.nio.Client;
 
 import myQuarto.clientpanes.PaneConnecting;
 import myQuarto.clientpanes.PaneNameRequest;
+import myQuarto.clientpanes.PaneQuartoGame;
 import myQuarto.clientpanes.PaneServerConnect;
 import myQuarto.netprot.QuartoPacket;
 import myQuarto.netprot.QuartoProtocol;
@@ -45,17 +49,34 @@ import static myQuarto.netprot.QuartoProtocol.quartoPacket;
 public class ClientApplication extends JFrame {
     private static final long serialVersionUID = 1L;
     
-    public static void main(String... args) {
-        Logger.getGlobal().setLevel(Level.FINEST);
+    public static void main(String... args) {        
+        Logger.getGlobal().setFilter(new Filter() {
+            @Override
+            public boolean isLoggable(LogRecord record) {
+                // TODO Auto-generated method stub
+                return Options.ENABLE_LOGGING;
+            }
+        });
         
         new ClientApplication().setVisible(true);
     }
     
     Socket sock;
     Client<QuartoPacket> client;
+    String clientName = "";
+    
+    PaneQuartoGame gamePane = new PaneQuartoGame();
+    
+    @Override
+    public void setContentPane(Container contentPane) {
+        super.setContentPane(contentPane);
+        super.validate();
+    }
     
     public ClientApplication() {
         client = new Client<>(QuartoProtocol.class);
+        
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         client.setReceiveHandler((c, packet) -> this.receivePacket(packet));
         
@@ -86,7 +107,7 @@ public class ClientApplication extends JFrame {
                 tryConnect(t, b.booleanValue());
             }
         }));
-        setSize(500, 200);
+        setSize(500, 150);
     }
     
     KeyPair localKeyPair;
@@ -154,7 +175,6 @@ public class ClientApplication extends JFrame {
                     tryConnect(t, b.booleanValue());
                 }
             }));
-            repaint();
             
             ((PaneServerConnect)getContentPane()).setStatus("RSA auth failed...");
             
@@ -163,19 +183,26 @@ public class ClientApplication extends JFrame {
         case "request_name":
             Logger.getGlobal().log(Level.INFO, "Server requesting nickname...");
             setContentPane(new PaneNameRequest((n) -> confirmName(n, false), (n) -> confirmName(n, true)));
-            repaint();
             
             break;
         case "deny_name_checkout":
-            Logger.getGlobal().log(Level.INFO, "Server denied nickname...");
             ((PaneNameRequest)getContentPane()).setStatus(packet.getString("message"));
             
             break;
         case "welcome":
-            setContentPane(new PaneConnecting());
+            Logger.getGlobal().log(Level.INFO, "Logged in...");
+            clientName = packet.getString("name");
+            setContentPane(gamePane);
             
-            ((PaneConnecting)getContentPane()).setStatus("Welcome " + packet.getString("name") + "...");
-            
+            break;
+        case "client_join":
+            if(!packet.getString("name").equals(clientName)) {
+                gamePane.addOnlineClient(packet.getString("name"));
+            }
+            break;
+        case "client_part":
+            gamePane.removeOnlineClient(packet.getString("name"));
+                        
             break;
         }
     }

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lolhens.network.nio.Client;
+import org.lolhens.network.nio.Server;
 import org.lolhens.network.protocol.AbstractBufferedProtocol;
 
 public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
@@ -70,5 +71,21 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
         }
         
         c.send(pack);
+    }
+
+    public static void quartoBroadcast(Server<QuartoPacket> s, String action, Object... pairs) {
+        
+        QuartoPacket pack = new QuartoPacket(action);
+        
+        if(pairs.length % 2 != 0) throw new IllegalArgumentException("Objects are not in tuples");
+        
+        for(int i = 0; i < pairs.length; i+=2) {
+            if(!(pairs[i] instanceof String)) throw new IllegalArgumentException("Key is not a string");
+            if(!(pairs[i+1] instanceof Serializable)) throw new IllegalArgumentException("Value is not Serializable");
+            
+            pack.put((String)pairs[i], pairs[i+1]);
+        }
+        
+        s.broadcast(pack);
     }
 }

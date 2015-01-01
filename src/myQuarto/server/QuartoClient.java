@@ -26,16 +26,18 @@ import org.lolhens.network.disconnect.DisconnectReason;
 import org.lolhens.network.nio.Client;
 
 import static myQuarto.netprot.QuartoProtocol.quartoPacket;
+import static myQuarto.netprot.QuartoProtocol.quartoBroadcast;
 
-public class ClientConnection extends Client<QuartoPacket> {
+public class QuartoClient extends Client<QuartoPacket> {
     QuartoServer assignedServer = null;
     
     boolean authenticated = false;
     String clientName = "";
+    PublicKey clientPubKey;
     
     Logger log = Logger.getGlobal();
 
-    public ClientConnection(Class<? extends AbstractProtocol> protocolClazz, QuartoServer quartoServer) {
+    public QuartoClient(Class<? extends AbstractProtocol> protocolClazz, QuartoServer quartoServer) {
         super(protocolClazz);
         assignedServer = quartoServer;
     }
@@ -71,11 +73,11 @@ public class ClientConnection extends Client<QuartoPacket> {
             Logger.getGlobal().log(Level.INFO, "pubkey received. generating checkdata");
             
             try {
-                PublicKey key = packet.<PublicKey>getObject("key");
+                clientPubKey = packet.<PublicKey>getObject("key");
                 
                 Cipher clCDCipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
                 
-                clCDCipher.init(Cipher.ENCRYPT_MODE, key);
+                clCDCipher.init(Cipher.ENCRYPT_MODE, clientPubKey);
                 
                 checkdata = new byte[256 - 11];
                 Random rnd = new Random();
@@ -100,9 +102,15 @@ public class ClientConnection extends Client<QuartoPacket> {
         case "confirm_privkey":
             if(Arrays.equals(packet.<byte[]>getObject("cdata"), checkdata)) {
                 Logger.getGlobal().log(Level.INFO, "client confirmed key");
-                //TODO: Get name from database
                 
-                quartoPacket(this, "request_name");
+                String name = assignedServer.dbGetNameForKey(clientPubKey);
+                              
+                if(name == null) {                
+                    quartoPacket(this, "request_name");
+                } else
+                {
+                    welcome(name);
+                }
             }
             else
             {
@@ -112,8 +120,31 @@ public class ClientConnection extends Client<QuartoPacket> {
             return;
         
         case "confirm_name":
+            if(packet.getString("name").length() < 3) {
+                quartoPacket(this, "deny_name_checkout", "message", "Name has to be at least 3 characters long...");
+                return;
+            }
             
-            quartoPacket(this, "deny_name_checkout", "message", "du bist kacke");
+            if(assignedServer.dbIsNameTaken(packet.getString("name"))) {
+                quartoPacket(this, "deny_name_checkout", "message", "Name already taken...");
+                return;
+            }
+            
+            if(packet.getString("name").equals("penis")) {
+                quartoPacket(this, "deny_name_checkout", "message", "Nein Dominik so darfst du nicht heißen");
+                return;
+            }
+            
+            if(packet.getBoolean("do_checkout")) {
+                Logger.getGlobal().log(Level.INFO, "Client requesting username: " + packet.getString("name"));
+                
+                assignedServer.dbSaveName(clientPubKey, packet.getString("name"));
+                welcome(assignedServer.dbGetNameForKey(clientPubKey));
+            }
+            else
+            {
+                quartoPacket(this, "deny_name_checkout", "message", "Available!");
+            }
             
             return;
         
@@ -126,9 +157,26 @@ public class ClientConnection extends Client<QuartoPacket> {
             e.printStackTrace();
         }
     }
+    
+    private void welcome(String name) {
+        quartoPacket(this, "welcome", "name", name);
+        
+        clientName = name;
+        assignedServer.clients.add(this);
+               
+        quartoBroadcast(assignedServer.server, "client_join", "key", clientPubKey, "name", name);
+        
+        for(QuartoClient client : assignedServer.clients) {
+            if(client != this && client.clientName != "") {
+                quartoPacket(this, "client_join", "key", client.clientPubKey);
+            }
+        }
+    }
 
     public void disconnect(DisconnectReason reason) {
-        
+        if(clientName != "") {
+            quartoBroadcast(assignedServer.server, "client_part", "key", clientPubKey, "name", clientName);
+        }
     }
 
 }

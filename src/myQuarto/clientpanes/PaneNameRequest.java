@@ -15,6 +15,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PaneNameRequest extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -22,13 +24,13 @@ public class PaneNameRequest extends JPanel {
     JLabel lblStatusLabel = new JLabel("Waiting for input...");
 
     public PaneNameRequest(Function<String, String> check, Function<String, String> confirm) {
-        setLayout(new MigLayout("", "[24px,grow]", "[34px,grow]"));
+        setLayout(new MigLayout("", "[24px,grow]", "[][34px,grow][][]"));
         
         JLabel lblChooseANickname = new JLabel("Choose a nickname:");
-        add(lblChooseANickname, "flowy,cell 0 0,alignx center");
+        add(lblChooseANickname, "cell 0 0,alignx center");
         
         textField = new JTextField();
-        add(textField, "cell 0 0,alignx center");
+        add(textField, "flowy,cell 0 1,alignx center");
         textField.setColumns(25);
         
         textField.getDocument().addDocumentListener(new DocumentListener() {
@@ -54,14 +56,17 @@ public class PaneNameRequest extends JPanel {
                 lblStatusLabel.setText(confirm.apply(textField.getText()));
             }
         });
+        add(btnNewButton, "cell 0 2,alignx center");
         
-        JLabel lblNewLabel = new JLabel("Waiting for input...");
-        add(lblNewLabel, "cell 0 0,alignx center");
-        add(btnNewButton, "cell 0 0,alignx center");
+        lblStatusLabel = new JLabel("Waiting for input...");
+        add(lblStatusLabel, "cell 0 3,alignx center");
     }
 
     public void setStatus(String text) {
         lblStatusLabel.setText(text);
         lblStatusLabel.repaint();
+        validate();
+        
+        Logger.getGlobal().log(Level.INFO, "DEBUG");
     }
 }
