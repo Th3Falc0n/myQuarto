@@ -19,10 +19,10 @@ import myQuarto.netprot.QuartoProtocol;
 
 import org.lolhens.network.AbstractClient;
 import org.lolhens.network.AbstractProtocol;
-import org.lolhens.network.IClientFactory;
+import org.lolhens.network.IFactoryClient;
 import org.lolhens.network.nio.Server;
 
-public class QuartoServer implements IClientFactory<QuartoPacket> {
+public class QuartoServer implements IFactoryClient<QuartoPacket> {
     protected String serverPassword = "";    
     
     protected List<QuartoClient> clients = new LinkedList<>();

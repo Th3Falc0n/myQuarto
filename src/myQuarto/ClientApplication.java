@@ -30,8 +30,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.swing.JFrame;
 
 import org.lolhens.network.AbstractClient;
-import org.lolhens.network.IConnectHandler;
-import org.lolhens.network.IDisconnectHandler;
+import org.lolhens.network.IHandlerConnect;
+import org.lolhens.network.IHandlerDisconnect;
 import org.lolhens.network.ProtocolProvider;
 import org.lolhens.network.disconnect.DisconnectReason;
 import org.lolhens.network.disconnect.Refused;
@@ -80,7 +80,7 @@ public class ClientApplication extends JFrame {
 
         client.setReceiveHandler((c, packet) -> this.receivePacket(packet));
         
-        client.setDisconnectHandler(new IDisconnectHandler<QuartoPacket>() {
+        client.setDisconnectHandler(new IHandlerDisconnect<QuartoPacket>() {
             
             @Override
             public void onDisconnect(ProtocolProvider<QuartoPacket> protocolProvider, DisconnectReason r) {
@@ -92,7 +92,7 @@ public class ClientApplication extends JFrame {
             }
         });
         
-        client.setConnectHandler(new IConnectHandler<QuartoPacket>() {
+        client.setConnectHandler(new IHandlerConnect<QuartoPacket>() {
             @Override
             public void onConnect(AbstractClient<QuartoPacket> c) {
                 Logger.getGlobal().log(Level.INFO, "Connection to established");

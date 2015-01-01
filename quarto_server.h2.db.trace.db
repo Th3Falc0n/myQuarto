@@ -1,0 +1,124 @@
+01-01 17:11:51 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:11:59 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:12:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:12:22 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+SELECT * FROM users [42102-176]
+01-01 17:14:26 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:27 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:29 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:29 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:29 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:36 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from USERS [42102-176]
+01-01 17:14:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "USERS" nicht gefunden
+Table "USERS" not found; SQL statement:
+select * from users [42102-176]
+01-01 17:14:48 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "LIST[*] "
+Syntax error in SQL statement "LIST[*] "; SQL statement:
+list [42000-176]
+01-01 17:14:51 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "LIST[*] TABLES "
+Syntax error in SQL statement "LIST[*] TABLES "; SQL statement:
+list tables [42000-176]
+01-01 17:14:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "LIST[*] TABLES "
+Syntax error in SQL statement "LIST[*] TABLES "; SQL statement:
+list tables [42000-176]
+01-01 17:14:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "LIST[*] TABLES "
+Syntax error in SQL statement "LIST[*] TABLES "; SQL statement:
+list tables [42000-176]
+01-01 17:14:54 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "LIST[*] TABLES "
+Syntax error in SQL statement "LIST[*] TABLES "; SQL statement:
+list tables [42000-176]
+01-01 17:15:37 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "USE[*] DB"; erwartet "UPDATE, {"
+Syntax error in SQL statement "USE[*] DB"; expected "UPDATE, {"; SQL statement:
+USE DB [42001-176]
+01-01 17:15:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "SELECT "; erwartet "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"
+Syntax error in SQL statement "SELECT "; expected "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"; SQL statement:
+SHOW DBS [42001-176]
+01-01 17:15:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "SELECT "; erwartet "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"
+Syntax error in SQL statement "SELECT "; expected "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"; SQL statement:
+SHOW DBS [42001-176]
+01-01 17:15:45 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax Fehler in SQL Befehl "SELECT "; erwartet "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"
+Syntax error in SQL statement "SELECT "; expected "TOP, LIMIT, DISTINCT, ALL, *, NOT, EXISTS, INTERSECTS"; SQL statement:
+SHOW DB [42001-176]
