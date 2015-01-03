@@ -134,4 +134,8 @@ public class QuartoServer implements IClientFactory<QuartoPacket> {
             Logger.getGlobal().log(Level.SEVERE, "SQL Exception", e);
         }
     }
+
+    public Server<QuartoPacket> getLibServer() {
+        return server;
+    }
 }

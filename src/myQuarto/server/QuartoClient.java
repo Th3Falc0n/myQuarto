@@ -32,6 +32,7 @@ public class QuartoClient extends Client<QuartoPacket> {
     QuartoServer assignedServer = null;
     
     boolean authenticated = false;
+    boolean connected = false;
     String clientName = "";
     PublicKey clientPubKey;
     
@@ -42,6 +43,18 @@ public class QuartoClient extends Client<QuartoPacket> {
         assignedServer = quartoServer;
     }
     
+    public QuartoServer getAssignedServer() {
+        return assignedServer;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
     byte[] checkdata = null;
 
     public void receivePacket(QuartoPacket packet) {
@@ -162,20 +175,21 @@ public class QuartoClient extends Client<QuartoPacket> {
         quartoPacket(this, "welcome", "name", name);
         
         clientName = name;
+        connected = true;
         assignedServer.clients.add(this);
                
-        quartoBroadcast(assignedServer.server, "client_join", "key", clientPubKey, "name", name);
+        quartoBroadcast(this, "client_join", "key", clientPubKey, "name", name);
         
         for(QuartoClient client : assignedServer.clients) {
             if(client != this && client.clientName != "") {
-                //quartoPacket(this, "client_join", "key", client.clientPubKey, "name", client.clientName);
+                quartoPacket(this, "client_join", "key", client.clientPubKey, "name", client.clientName);
             }
         }
     }
 
     public void disconnect(DisconnectReason reason) {
         if(clientName != "") {
-            quartoBroadcast(assignedServer.server, "client_part", "key", clientPubKey, "name", clientName);
+            quartoBroadcast(this, "client_part", "key", clientPubKey, "name", clientName);
         }
     }
 

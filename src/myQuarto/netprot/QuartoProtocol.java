@@ -14,6 +14,8 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import myQuarto.server.QuartoClient;
+
 import org.lolhens.network.nio.Client;
 import org.lolhens.network.nio.Server;
 import org.lolhens.network.protocol.AbstractBufferedProtocol;
@@ -73,7 +75,7 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
         c.send(pack);
     }
 
-    public static void quartoBroadcast(Server<QuartoPacket> s, String action, Object... pairs) {
+    public static void quartoBroadcast(QuartoClient c, String action, Object... pairs) {
         
         QuartoPacket pack = new QuartoPacket(action);
         
@@ -86,6 +88,9 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
             pack.put((String)pairs[i], pairs[i+1]);
         }
         
-        s.broadcast(pack);
+        c.getAssignedServer().getLibServer().broadcast((cl) -> {
+            if((QuartoClient)cl == c) return false;
+            return ((QuartoClient)cl).isConnected();
+        }, pack);
     }
 }
