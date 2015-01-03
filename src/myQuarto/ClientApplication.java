@@ -113,97 +113,102 @@ public class ClientApplication extends JFrame {
     KeyPair localKeyPair;
     
     private void receivePacket(QuartoPacket packet) {
-        switch(packet.getAction()) {
-        case "get_password":
-            Logger.getGlobal().log(Level.INFO, "Server requesting password");
-            
-            quartoPacket(client, "send_password", "password", ((PaneServerConnect)getContentPane()).getEnteredPassword());
-            break;
-        case "deny_password":
-            ((PaneServerConnect)getContentPane()).setStatus("Wrong password...");
-            
-            try {
-                client.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            break;
-        case "request_identity":
-            Logger.getGlobal().log(Level.INFO, "Server requesting identity");
-            
-            setContentPane(new PaneConnecting());
-            
-            ((PaneConnecting)getContentPane()).setStatus("Loading keypair...");
-            
-            localKeyPair = loadKeyPair();
-            
-            if(localKeyPair == null) {
-                ((PaneConnecting)getContentPane()).setStatus("Generating keypair...");
+        try {
+            switch(packet.getAction()) {
+            case "get_password":
+                Logger.getGlobal().log(Level.INFO, "Server requesting password");
                 
-                localKeyPair = generateKeyPair();
-                saveKeyPair(localKeyPair);
-            }
-            
-            quartoPacket(client, "send_pubkey", "key", localKeyPair.getPublic());      
-            
-            ((PaneConnecting)getContentPane()).setStatus("Authenticating...");
-            
-            break; 
-        case "confirm_srvkey":
-            Logger.getGlobal().log(Level.INFO, "Server requesting key confirmation");
-            try {
-                Cipher clPubkeyCipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+                quartoPacket(client, "send_password", "password", ((PaneServerConnect)getContentPane()).getEnteredPassword());
+                break;
+            case "deny_password":
+                ((PaneServerConnect)getContentPane()).setStatus("Wrong password...");
                 
-                clPubkeyCipher.init(Cipher.DECRYPT_MODE, localKeyPair.getPrivate());
-                
-                byte[] pkDec = clPubkeyCipher.doFinal(packet.<byte[]>getObject("cipher"));
-                
-                quartoPacket(client, "confirm_privkey", "cdata", pkDec);
-                
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            
-            break;
-        case "authentication_fail":
-            Logger.getGlobal().log(Level.INFO, "RSA auth failed...");
-            setContentPane(new PaneServerConnect(new BiConsumer<String, Boolean>() {
-                @Override
-                public void accept(String t, Boolean b) {
-                    tryConnect(t, b.booleanValue());
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-            }));
-            
-            ((PaneServerConnect)getContentPane()).setStatus("RSA auth failed...");
-            
-            
-            break;
-        case "request_name":
-            Logger.getGlobal().log(Level.INFO, "Server requesting nickname...");
-            setContentPane(new PaneNameRequest((n) -> confirmName(n, false), (n) -> confirmName(n, true)));
-            
-            break;
-        case "deny_name_checkout":
-            ((PaneNameRequest)getContentPane()).setStatus(packet.getString("message"));
-            
-            break;
-        case "welcome":
-            Logger.getGlobal().log(Level.INFO, "Logged in...");
-            clientName = packet.getString("name");
-            setContentPane(gamePane);
-            
-            break;
-        case "client_join":
-            if(!packet.getString("name").equals(clientName)) {
-                gamePane.addOnlineClient(packet.getString("name"));
+                break;
+            case "request_identity":
+                Logger.getGlobal().log(Level.INFO, "Server requesting identity");
+                
+                setContentPane(new PaneConnecting());
+                
+                ((PaneConnecting)getContentPane()).setStatus("Loading keypair...");
+                
+                localKeyPair = loadKeyPair();
+                
+                if(localKeyPair == null) {
+                    ((PaneConnecting)getContentPane()).setStatus("Generating keypair...");
+                    
+                    localKeyPair = generateKeyPair();
+                    saveKeyPair(localKeyPair);
+                }
+                
+                quartoPacket(client, "send_pubkey", "key", localKeyPair.getPublic());      
+                
+                ((PaneConnecting)getContentPane()).setStatus("Authenticating...");
+                
+                break; 
+            case "confirm_srvkey":
+                Logger.getGlobal().log(Level.INFO, "Server requesting key confirmation");
+                try {
+                    Cipher clPubkeyCipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+                    
+                    clPubkeyCipher.init(Cipher.DECRYPT_MODE, localKeyPair.getPrivate());
+                    
+                    byte[] pkDec = clPubkeyCipher.doFinal(packet.<byte[]>getObject("cipher"));
+                    
+                    quartoPacket(client, "confirm_privkey", "cdata", pkDec);
+                    
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                
+                break;
+            case "authentication_fail":
+                Logger.getGlobal().log(Level.INFO, "RSA auth failed...");
+                setContentPane(new PaneServerConnect(new BiConsumer<String, Boolean>() {
+                    @Override
+                    public void accept(String t, Boolean b) {
+                        tryConnect(t, b.booleanValue());
+                    }
+                }));
+                
+                ((PaneServerConnect)getContentPane()).setStatus("RSA auth failed...");
+                
+                
+                break;
+            case "request_name":
+                Logger.getGlobal().log(Level.INFO, "Server requesting nickname...");
+                setContentPane(new PaneNameRequest((n) -> confirmName(n, false), (n) -> confirmName(n, true)));
+                
+                break;
+            case "deny_name_checkout":
+                ((PaneNameRequest)getContentPane()).setStatus(packet.getString("message"));
+                
+                break;
+            case "welcome":
+                Logger.getGlobal().log(Level.INFO, "Logged in...");
+                clientName = packet.getString("name");
+                setContentPane(gamePane);
+                
+                break;
+            case "client_join":
+                if(!packet.getString("name").equals(clientName)) {
+                    gamePane.addOnlineClient(packet.getString("name"));
+                }
+                break;
+            case "client_part":
+                gamePane.removeOnlineClient(packet.getString("name"));
+                            
+                break;
             }
-            break;
-        case "client_part":
-            gamePane.removeOnlineClient(packet.getString("name"));
-                        
-            break;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
     

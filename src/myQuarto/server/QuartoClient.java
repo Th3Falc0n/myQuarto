@@ -168,7 +168,7 @@ public class QuartoClient extends Client<QuartoPacket> {
         
         for(QuartoClient client : assignedServer.clients) {
             if(client != this && client.clientName != "") {
-                quartoPacket(this, "client_join", "key", client.clientPubKey);
+                //quartoPacket(this, "client_join", "key", client.clientPubKey, "name", client.clientName);
             }
         }
     }
