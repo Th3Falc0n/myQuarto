@@ -23,6 +23,7 @@ import javax.swing.JList;
 
 import java.awt.GridBagConstraints;
 
+import myQuarto.netprot.QuartoPacket;
 import net.miginfocom.swing.MigLayout;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -47,6 +48,7 @@ import java.util.function.Consumer;
 import javax.swing.JMenuBar;
 
 import java.awt.List;
+
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
@@ -112,5 +114,10 @@ public class PaneQuartoGame extends JPanel {
     
     public void removeOnlineClient(String string) {
         list.remove(string);
+    }
+
+    public void showPlayerData(QuartoPacket packet) {
+        // TODO Auto-generated method stub
+        
     }
 }

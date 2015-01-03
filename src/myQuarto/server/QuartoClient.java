@@ -33,10 +33,14 @@ public class QuartoClient extends Client<QuartoPacket> {
     
     boolean authenticated = false;
     boolean connected = false;
-    String clientName = "";
     PublicKey clientPubKey;
     
     Logger log = Logger.getGlobal();
+
+    byte[] checkdata = null;
+
+    String clientName = "";
+    int clientELO = 1000;
 
     public QuartoClient(Class<? extends AbstractProtocol> protocolClazz, QuartoServer quartoServer) {
         super(protocolClazz);
@@ -54,8 +58,6 @@ public class QuartoClient extends Client<QuartoPacket> {
     public boolean isConnected() {
         return connected;
     }
-
-    byte[] checkdata = null;
 
     public void receivePacket(QuartoPacket packet) {
         switch(packet.getAction()) {
@@ -177,6 +179,8 @@ public class QuartoClient extends Client<QuartoPacket> {
         clientName = name;
         connected = true;
         assignedServer.clients.add(this);
+        
+        assignedServer.dbLoadClient(this);
                
         quartoBroadcast(this, "client_join", "key", clientPubKey, "name", name);
         
@@ -188,6 +192,8 @@ public class QuartoClient extends Client<QuartoPacket> {
     }
 
     public void disconnect(DisconnectReason reason) {
+        assignedServer.dbSaveClient(this);
+        
         if(clientName != "") {
             quartoBroadcast(this, "client_part", "key", clientPubKey, "name", clientName);
         }

@@ -205,6 +205,10 @@ public class ClientApplication extends JFrame {
                 gamePane.removeOnlineClient(packet.getString("name"));
                             
                 break;
+            case "show_player_data":
+                gamePane.showPlayerData(packet);
+                
+                break;
             }
         }
         catch (Exception e) {

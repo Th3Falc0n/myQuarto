@@ -89,7 +89,7 @@ public class QuartoProtocol extends AbstractBufferedProtocol<QuartoPacket>{
         }
         
         c.getAssignedServer().getLibServer().broadcast((cl) -> {
-            if((QuartoClient)cl == c) return false;
+            if(cl == c) return false;
             return ((QuartoClient)cl).isConnected();
         }, pack);
     }

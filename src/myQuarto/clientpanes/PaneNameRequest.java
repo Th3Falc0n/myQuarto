@@ -3,6 +3,7 @@ package myQuarto.clientpanes;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import myQuarto.netprot.QuartoPacket;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.JButton;

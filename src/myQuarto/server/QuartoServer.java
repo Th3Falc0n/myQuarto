@@ -48,7 +48,7 @@ public class QuartoServer implements IClientFactory<QuartoPacket> {
                 
                 databaseConnection = DriverManager.getConnection(url, user, pwds);
                 
-                databaseConnection.createStatement().execute("CREATE TABLE IF NOT EXISTS users(key BINARY(294) PRIMARY KEY, name VARCHAR(255));");
+                databaseConnection.createStatement().execute("CREATE TABLE IF NOT EXISTS users(key BINARY(294) PRIMARY KEY, name VARCHAR(255), elo INTEGER);");
             } catch (SQLException e) {
                 Logger.getGlobal().log(Level.SEVERE, "SQL Exception", e);
             }
@@ -133,6 +133,31 @@ public class QuartoServer implements IClientFactory<QuartoPacket> {
         catch (SQLException e) {
             Logger.getGlobal().log(Level.SEVERE, "SQL Exception", e);
         }
+    }
+    
+    public void dbLoadClient(QuartoClient client) {
+        try {
+            PreparedStatement stmt = databaseConnection.prepareStatement("SELECT * FROM users WHERE key = ?");
+            
+            stmt.setBytes(1, client.clientPubKey.getEncoded());
+            
+            ResultSet res = stmt.executeQuery();
+            res.next();
+            
+            client.clientELO = res.getInt("elo");
+            
+            res.close();
+            stmt.close();
+            
+            return;
+        }
+        catch (SQLException e) {
+            Logger.getGlobal().log(Level.SEVERE, "SQL Exception", e);
+        }
+    }
+
+    public void dbSaveClient(QuartoClient quartoClient) {
+        
     }
 
     public Server<QuartoPacket> getLibServer() {
